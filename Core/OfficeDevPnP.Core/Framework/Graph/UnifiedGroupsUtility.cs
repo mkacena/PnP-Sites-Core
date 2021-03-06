@@ -159,7 +159,7 @@ namespace OfficeDevPnP.Core.Framework.Graph
                     var newGroup = new GroupExtended
                     {
                         DisplayName = displayName,
-                        Description = description,
+                        Description = String.IsNullOrEmpty(description) ? null : description,
                         MailNickname = mailNickname,
                         MailEnabled = true,
                         SecurityEnabled = false,
@@ -312,10 +312,10 @@ namespace OfficeDevPnP.Core.Framework.Graph
                         // And if any, add it to the collection of group's owners
                         await graphClient.Groups[groupId].Members.References.Request().AddAsync(member);
                     }
-                    catch (ServiceException ex)
+                    catch (Exception ex)
                     {
-                        if (ex.Error.Code == "Request_BadRequest" &&
-                            ex.Error.Message.Contains("added object references already exist"))
+                        if (ex.InnerException.Message.Contains("Request_BadRequest") &&
+                            ex.InnerException.Message.Contains("added object references already exist"))
                         {
                             // Skip any already existing member
                         }
@@ -401,10 +401,10 @@ namespace OfficeDevPnP.Core.Framework.Graph
                         // And if any, add it to the collection of group's owners
                         await graphClient.Groups[groupId].Owners.References.Request().AddAsync(owner);
                     }
-                    catch (ServiceException ex)
+                    catch (Exception ex)
                     {
-                        if (ex.Error.Code == "Request_BadRequest" &&
-                            ex.Error.Message.Contains("added object references already exist"))
+                        if (ex.InnerException.Message.Contains("Request_BadRequest") &&
+                            ex.InnerException.Message.Contains("added object references already exist"))
                         {
                             // Skip any already existing owner
                         }
@@ -1719,12 +1719,11 @@ namespace OfficeDevPnP.Core.Framework.Graph
             try
             {
                 groupId = groupId.ToLower();
-                string getGroupsInfo = $"{GraphHttpClient.MicrosoftGraphV1BaseUri}groups/{groupId}?&select=resourceProvisioningOptions";
-
-                string getGroupsWithATeamsTeam = $"{GraphHttpClient.MicrosoftGraphBetaBaseUri}groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team')&select=id,resourceProvisioningOptions";
+                
+                string getGroupsInfo = $"{GraphHttpClient.MicrosoftGraphV1BaseUri}groups/{groupId}?$select=resourceProvisioningOptions";
 
                 var getGroupResult = GraphHttpClient.MakeGetRequestForString(
-                    getGroupsWithATeamsTeam,
+                    getGroupsInfo,
                     accessToken: accessToken);
 
                 using (var jsonDocument = JsonDocument.Parse(getGroupResult))
@@ -1750,29 +1749,51 @@ namespace OfficeDevPnP.Core.Framework.Graph
         /// </summary>
         /// <param name="groupId">The ID of the Office 365 Group</param>
         /// <param name="accessToken">The OAuth 2.0 Access Token to use for invoking the Microsoft Graph</param>
+        /// <param name="timeoutSeconds">Time to wait till Team is created. Default is 300 seconds (5 mins)</param>
         /// <returns></returns>
-        public static async Task CreateTeam(String groupId, String accessToken)
+        public static async Task CreateTeam(string groupId, string accessToken, int timeoutSeconds = 300)
         {
-            if (String.IsNullOrEmpty(groupId))
+            if (string.IsNullOrEmpty(groupId))
             {
                 throw new ArgumentNullException(nameof(groupId));
             }
-            if (String.IsNullOrEmpty(accessToken))
+            if (string.IsNullOrEmpty(accessToken))
             {
                 throw new ArgumentNullException(nameof(accessToken));
             }
+
             var createTeamEndPoint = GraphHttpClient.MicrosoftGraphV1BaseUri + $"groups/{groupId}/team";
-            try
+            bool wait = true;
+            int iterations = 0;
+            while (wait)
             {
-                await Task.Run(() =>
+                iterations++;
+                try
                 {
-                    GraphHttpClient.MakePutRequest(createTeamEndPoint, new { }, "application/json", accessToken);
-                });
-            }
-            catch (ServiceException ex)
-            {
-                Log.Error(Constants.LOGGING_SOURCE, CoreResources.GraphExtensions_ErrorOccured, ex.Error.Message);
-                throw;
+                    await Task.Run(() =>
+                    {
+                        var teamid = HttpHelper.MakePutRequestForString(createTeamEndPoint, new { }, "application/json", accessToken);
+                        if (!string.IsNullOrEmpty(teamid))
+                        {
+                            wait = false;
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    // Don't wait more than the requested timeout in seconds
+                    if (iterations * 30 >= timeoutSeconds)
+                    {
+                        wait = false;
+                        throw;
+                    }
+                    else
+                    {
+                        // In case of exception wait for 30 secs
+                        Log.Error(Constants.LOGGING_SOURCE, CoreResources.GraphExtensions_ErrorOccured, ex.Message);
+                        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(30));
+                    }
+                }
             }
         }
 

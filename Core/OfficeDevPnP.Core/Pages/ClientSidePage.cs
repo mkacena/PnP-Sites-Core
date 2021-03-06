@@ -1,4 +1,4 @@
-﻿using AngleSharp.Parser.Html;
+﻿using AngleSharp.Html.Parser;
 using Microsoft.SharePoint.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -2046,7 +2046,7 @@ namespace OfficeDevPnP.Core.Pages
             }
 
             HtmlParser parser = new HtmlParser(new HtmlParserOptions() { IsEmbedded = true });
-            using (var document = parser.Parse(html))
+            using (var document = parser.ParseDocument(html))
             {
                 // select all control div's
                 var clientSideControls = document.All.Where(m => m.HasAttribute(CanvasControl.ControlDataAttribute));
@@ -2224,15 +2224,15 @@ namespace OfficeDevPnP.Core.Pages
                     }
                     else if (section.Columns.Count == 3)
                     {
-                        if (section.Columns[1].ColumnFactor == 6)
+                        if (section.Columns[0].ColumnFactor == 6)
                         {
                             section.Type = CanvasSectionTemplate.TwoColumnVerticalSection;
                         }
-                        else if (section.Columns[1].ColumnFactor == 4)
+                        else if (section.Columns[0].ColumnFactor == 4)
                         {
                             section.Type = CanvasSectionTemplate.TwoColumnRightVerticalSection;
                         }
-                        else if (section.Columns[1].ColumnFactor == 8)
+                        else if (section.Columns[0].ColumnFactor == 8)
                         {
                             section.Type = CanvasSectionTemplate.TwoColumnLeftVerticalSection;
                         }
@@ -2252,7 +2252,7 @@ namespace OfficeDevPnP.Core.Pages
             // Load page header controls. Cortex Topic pages do have 5 controls in the header (= controls that cannot be moved)
             if (LayoutType == ClientSidePageLayoutType.Topic)
             {
-                using (var document = parser.Parse(pageHeaderHtml))
+                using (var document = parser.ParseDocument(pageHeaderHtml))
                 {
                     // select all control div's
                     var clientSideHeaderControls = document.All.Where(m => m.HasAttribute(CanvasControl.ControlDataAttribute));

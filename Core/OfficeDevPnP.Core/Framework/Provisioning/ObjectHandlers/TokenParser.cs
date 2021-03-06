@@ -794,8 +794,7 @@ namespace OfficeDevPnP.Core.Framework.Provisioning.ObjectHandlers
 
                 foreach (var contentType in list.ContentTypes)
                 {
-                    _tokens.Add(new ListContentTypeIdToken(web, list.Title, contentType.Name, contentType.Id));
-                    _tokens.Add(new ListContentTypeIdToken(web, list.Title, contentType.Id.GetParentIdValue(), contentType.Id));
+                    _tokens.Add(new ListContentTypeIdToken(web, list.Title, contentType));
                 }
             }
 
@@ -839,7 +838,7 @@ namespace OfficeDevPnP.Core.Framework.Provisioning.ObjectHandlers
                 foreach (var entry in entries)
                 {
                     CultureInfo ci = new CultureInfo((int)entry.LCID);
-                    resourceValues.Add(new Tuple<string, string>(ci.Name, entry.Value));
+                    resourceValues.Add(new Tuple<string, string>(ci.Name, ParseString(entry.Value)));
                 }
             }
             return resourceValues;

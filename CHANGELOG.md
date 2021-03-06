@@ -6,6 +6,56 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+**PnP Sites Core has retired, please use [PnP Framework](https://github.com/pnp/pnpframework) going forward.**
+
+# [3.28.2012.0 December 2020 release]
+
+## Added
+
+- Added support to PersistMultiLanguageResources for Footer Navigation #2755 [czullu - Christian Zuellig]
+- Allow to pass Microsoft.SharePoint.Client.AddFieldOptions when creating a field through FieldCreationInformation #2754 [Giacomo Pozzoni - jackpoz]
+
+## Changed
+
+- Fixed issue with provisioning template footer links being provisioned in reverse order
+- Moved to latest AngleSharp release #2818 [netclectic - Adrian Cockburn]
+- Add listcontenttype tokenization #2583 [jensotto - Jens Otto Hatlevold]
+- Fix adding Footer nodes on new sites #2740 #2819 [kkrzaczkowski]
+- Fixed an "InvalidOperationException" when extracting multilingual resources in a multi-threaded environment #2756 [fzbm - Florian Zink]
+- Resolve fileuniqueid or fileuniqueidencoeded in DataRow Value if not already resolved by parser #2745 [czullu - Christian Zuellig]
+- #2772 Fix token replacement during lookup field deployment #2785 [SLTKA - Alexandr Yeskov]
+
+# [3.27.2011.0 November 2020 release]
+
+## Added
+
+## Changed
+
+- Fix issue with handling of terms with comma and provided GUID #2776 [reusto]
+- Fix for sublinks not provisioned in Footer #2797 [kkrzaczkowski]
+- Fix for issue #2324 - The property or field 'WelcomePage' has not been initialized #2759 [wspelt - Wouter Spelt]
+- Fix: Incorrect HasTeamsTeam check #2763 [gautamdsheth - Gautam Sheth]
+- Fix: CustomFormatter Compare to treat "" and Null as same string #2746 [czullu - Christian Zuellig]
+- Adjust tenant admin check to support an App Only AAD connection #2784 [Mike Jensen - michael-jensen]
+- Fix #2773 - changed Exception type for duplicate members and owners #2775 [Gautam Sheth - gautamdsheth]
+- Handle AddWebPartToWikiPage() being called on a non-wiki page #2762 [Giacomo Pozzoni - jackpoz]
+- Features/fix for collection not initialized exception issue #2580 (fix for issue 2324 accidentally came in also with this commit, but is submitted separately as well) #2760 [Wouter Spelt - wspelt]
+- Reapply PR #2596 which addresses Issue #2595 #2790 [Mike Jensen - michael-jensen]
+- All COntent of the Field needs proper HtmlEncode not only & #2802 [czullu - Christian Zuellig]
+- Update provisioning token apppackageid description #2800 [Joel Rodrigues - joelfmrodrigues]
+- Fix Layout dedection for TwoColumnRightVerticalSection and TwoColumnLeftVerticalSection #2801 [czullu - Christian Zuellig]
+- Fix Folder Compare - not match if Foldername contains + #2803 [czullu - Christian Zuellig]
+
+# [3.26.2010.0 October 2020 release]
+
+## Changed
+
+- Update extract-configuration.schema.json #2747 [pschaeflein - Paul Schaeflein]
+- Additional check while extracting/setting hub site #2489 [gautamdsheth - Gautam Sheth]
+- Multiple improvements while working with Teams #2476 [gautamdsheth - Gautam Sheth]
+- Added retry mechanism to handle team creation replication delays #2521 [gautamdsheth - Gautam Sheth]
+- Fix site design token parsing (and application) in tenant provisioning #2736 [michael-jensen - Mike Jensen]
+
 ## [3.25.2009.1 September 2020 release]
 
 ## Changed
